@@ -42,8 +42,5 @@ export const _getNormalizedRut = (rut: string) => {
 
     const components = rut.split("-");
 
-    return {
-        id: _getNormalizedRutId(components[0]),
-        checkDigit: _getNormalizedRutCheckDigit(components[1]),
-    };
+    return _getNormalizedRutId(components[0]) + "-" + _getNormalizedRutCheckDigit(components[1]);
 };
