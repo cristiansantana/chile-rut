@@ -23,7 +23,7 @@ export const _validateRutCheckDigitFormat = (checkDigit: string) => {
 export const _validateRut = (rut: string) => {
     
     if (!_validateRutFormat(rut)) {
-        throw new Error("Error: Rut Id has a non valid format");
+        return false;
     }
 
     const normalizedRut = _getNormalizedRut(rut);
