@@ -27,6 +27,9 @@ export const _validateRut = (rut: string) => {
     }
 
     const normalizedRut = _getNormalizedRut(rut);
+    const components = normalizedRut.split("-");
+    const id = components[0];
+    const checkDigit = components[1];
 
-    return normalizedRut.checkDigit === _getCheckDigit(normalizedRut.id);
+    return checkDigit === _getCheckDigit(id);
 };
