@@ -1,6 +1,6 @@
 # Chile-Rut
 
-Chile-Rut is a utility for working with the Chilean identification number (known as RUT or RUN).
+Chile-Rut is a **Javscript (Typescript) package** for working with the Chilean identification number (known as RUT or RUN).
 
 ## Features
 
