@@ -9,7 +9,7 @@ export const _getNormalizedRutId = (rutNumber: string) => {
 
     const digitRegex = /^\d$/;
 
-    return rutNumber.split("").reduce((previous, current) => {
+    const normalizedRut = rutNumber.split("").reduce((previous, current) => {
 
         if (current === "0" && !previous) {
             return "";
@@ -21,6 +21,12 @@ export const _getNormalizedRutId = (rutNumber: string) => {
 
         return previous;
     }, "" as string);
+
+    if (normalizedRut === "") {
+        throw new Error("Error: RUT Number has non valid format");
+    }
+
+    return normalizedRut;
 };
 
 /** @internal */
