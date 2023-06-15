@@ -4,9 +4,9 @@ Chile-Rut is a **Javscript (Typescript) package** for working with the Chilean i
 
 ## Features
 
-- Validating a RUT (Chilean identification number) using its check digit.
-- Obtaining the check digit for a RUT.
-- Verifying if the format of a RUT is correct.
+- Validate a RUT (Chilean identification number) using its check digit.
+- Obtain the check digit for a RUT.
+- Verify if the format of a RUT is correct.
 
 ## Installation
 
@@ -62,7 +62,7 @@ else {
 
 ### Validate a RUT
 
-Use the `validateRut` function with a RUT as parameter for validate it.
+Use the `validateRut` function with a RUT as parameter for validate it. This function **does not test/verify the actual existence of the RUT**, it only checks that it is well-formed
 
 ```js
 import { validateRut } from "@cristiansantana/chile-rut";
@@ -75,7 +75,8 @@ console.log(validateRut("12345678-6")); // -> output expected: false
 
 `validateRut` support the parameter rut as:
 
-- "12345678-5"
-- "12.345.678-5"
-- "12,345,678-5"
-- "012.345.678-5"
+- "12345678-5" <- without thousands separator
+- "12.345.678-5" <- dots as the thousands separator
+- "12,345,678-5" <- commas as the thousands separator
+- "012345678-5" <- leading with zeros (also work with thousands separator)
+
