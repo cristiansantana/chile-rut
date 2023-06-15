@@ -1,6 +1,7 @@
 # Chile-Rut
 ![testing status](https://github.com/cristiansantana/chile-rut/actions/workflows/testing.yml/badge.svg)
-Chile-Rut is a **Javscript (Typescript) package** for working with the Chilean identification number (known as RUT or RUN).
+
+Chile-Rut is a Javascript (Typescript ready) package for working with the Chilean identification number (known as RUT or RUN).
 
 ## Features
 
@@ -79,4 +80,3 @@ console.log(validateRut("12345678-6")); // -> output expected: false
 - "12.345.678-5" <- dots as the thousands separator
 - "12,345,678-5" <- commas as the thousands separator
 - "012345678-5" <- leading with zeros (also work with thousands separator)
-
