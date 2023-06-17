@@ -1,5 +1,5 @@
 # Chile-Rut
-![build status](https://github.com/cristiansantana/chile-rut/actions/workflows/build.yml/badge.svg)
+[![testing status](https://github.com/cristiansantana/chile-rut/actions/workflows/testing.yml/badge.svg)](https://github.com/cristiansantana/chile-rut/actions/workflows/build.yml?query=branch%3Amain++)
 
 Chile-Rut is a Javascript (Typescript ready) package for working with the Chilean identification number (known as RUT or RUN).
 
