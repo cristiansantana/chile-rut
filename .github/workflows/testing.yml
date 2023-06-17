@@ -2,10 +2,8 @@ name: Testing
 run-name: ${{ github.actor }} is running the tests
 
 on:
-    push:
-        branches: [main, develop]
     pull_request:
-        branches: [main, develop]
+        branches: [main]
 
 jobs:
     build:
