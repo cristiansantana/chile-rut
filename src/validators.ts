@@ -3,13 +3,13 @@ import { _getCheckDigit } from "./utilities";
 
 /** @internal */
 export const _validateRutFormat = (rut: string) => {
-    const validRegex = /^([0-9]{1,3}(\.[0-9]{3}){0,2}|[0-9]{1,3}(,[0-9]{3}){0,2}|[0-9]{1,9})-(k|K|[0-9])$/;
+    const validRegex = /^([0-9]{1,3}(\.[0-9]{3})*|[0-9]{1,3}(,[0-9]{3})*|[0-9]+)-(k|K|[0-9])$/;
     return validRegex.test(rut);
 };
 
 /** @internal */
 export const _validateRutIdFormat = (rut: string) => {
-    const validRegex = /^([0-9]{1,3}(\.[0-9]{3}){0,2}|[0-9]{1,3}(,[0-9]{3}){0,2}|[0-9]{1,9})$/;
+    const validRegex = /^([0-9]{1,3}(\.[0-9]{3})*|[0-9]{1,3}(,[0-9]{3})*|[0-9]+)$/;
     return validRegex.test(rut);
 };
 
