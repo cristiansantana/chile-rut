@@ -1,132 +1,54 @@
 import {
     getCheckDigit,
-    validateRut
+    validateRut,
 } from ".";
 
-describe("testing getCheckDigit function", () => {
+describe("testing index", () => {
 
-    test("getCheckDigit of 12345678", () => {
+    test("getCheckDigit of well formed rut ids", () => {
         expect(getCheckDigit("12345678")).toBe("5");
-    });
-
-    test("getCheckDigit of 12.345.678", () => {
         expect(getCheckDigit("12.345.678")).toBe("5");
-    });
-
-    test("getCheckDigit of 12,345,678", () => {
         expect(getCheckDigit("12,345,678")).toBe("5");
-    });
-
-    test("getCheckDigit of 00012345678", () => {
         expect(getCheckDigit("00012345678")).toBe("5");
-    });
-
-    test("getCheckDigit of 00.012.345.678", () => {
         expect(getCheckDigit("00.012.345.678")).toBe("5");
-    });
-
-    test("getCheckDigit of 0,012,345,678", () => {
         expect(getCheckDigit("0,012,345,678")).toBe("5");
     });
 
-    test("getCheckDigit of \"\"", () => {
+    test("getCheckDigit of malformed rut ids", () => {
         expect(() => getCheckDigit("")).toThrow();
-    });
-
-    test("getCheckDigit of \"a\"", () => {
+        expect(() => getCheckDigit("a")).toThrow();
         expect(() => getCheckDigit("a")).toThrow();
     });
 
-    test("getCheckDigit of \"1 2\"", () => {
-        expect(() => getCheckDigit("a")).toThrow();
-    });
-
-});
-
-describe("testing validateRut function", () => {
-
-    test("validateRut of 12345678-0", () => {
-        expect(validateRut("12345678-0")).toBe(false);
-    });
-
-    test("validateRut of 12345678-1", () => {
-        expect(validateRut("12345678-1")).toBe(false);
-    });
-
-    test("validateRut of 12345678-2", () => {
-        expect(validateRut("12345678-2")).toBe(false);
-    });
-
-    test("validateRut of 12345678-3", () => {
-        expect(validateRut("12345678-3")).toBe(false);
-    });
-
-    test("validateRut of 12345678-4", () => {
-        expect(validateRut("12345678-4")).toBe(false);
-    });
-
-    test("validateRut of 12345678-5", () => {
+    test("validateRut of well formed and valid ruts", () => {
         expect(validateRut("12345678-5")).toBe(true);
-    });
-
-    test("validateRut of 12345678-6", () => {
-        expect(validateRut("12345678-6")).toBe(false);
-    });
-
-    test("validateRut of 12345678-7", () => {
-        expect(validateRut("12345678-7")).toBe(false);
-    });
-
-    test("validateRut of 12345678-8", () => {
-        expect(validateRut("12345678-8")).toBe(false);
-    });
-
-    test("validateRut of 12345678-9", () => {
-        expect(validateRut("12345678-9")).toBe(false);
-    });
-
-    test("validateRut of 12345678-k", () => {
-        expect(validateRut("12345678-k")).toBe(false);
-    });
-
-    test("validateRut of 12345678-K", () => {
-        expect(validateRut("12345678-K")).toBe(false);
-    });
-
-    test("validateRut of 12.345.678-5", () => {
         expect(validateRut("12.345.678-5")).toBe(true);
-    });
-
-    test("validateRut of 12,345,678-5", () => {
         expect(validateRut("12,345,678-5")).toBe(true);
-    });
-
-    test("validateRut of 00012345678-5", () => {
         expect(validateRut("00012345678-5")).toBe(true);
-    });
-
-    test("validateRut of 0.012.345.678-5", () => {
         expect(validateRut("0.012.345.678-5")).toBe(true);
-    });
-
-    test("validateRut of 0,012,345,678-5", () => {
         expect(validateRut("0,012,345,678-5")).toBe(true);
     });
 
-    test("validateRut of 12345678", () => {
+    test("validateRut of well formed and invalid ruts", () => {
+        expect(validateRut("12345678-0")).toBe(false);
+        expect(validateRut("12345678-1")).toBe(false);
+        expect(validateRut("12345678-2")).toBe(false);
+        expect(validateRut("12345678-3")).toBe(false);
+        expect(validateRut("12345678-4")).toBe(false);
+        expect(validateRut("12345678-6")).toBe(false);
+        expect(validateRut("12345678-7")).toBe(false);
+        expect(validateRut("12345678-8")).toBe(false);
+        expect(validateRut("12345678-9")).toBe(false);
+        expect(validateRut("12345678-K")).toBe(false);
+        expect(validateRut("12345678-k")).toBe(false);
+    });
+
+    test("validateRut of malformed ruts", () => {
         expect(validateRut("")).toBe(false);
-    });
-
-    test("validateRut of \"\"", () => {
-        expect(validateRut("")).toBe(false)
-    });
-
-    test("validateRut of \"a\"", () => {
-        expect(validateRut("a")).toBe(false)
-    });
-
-    test("validateRut of \"1 2\"", () => {
-        expect(validateRut("1 2")).toBe(false)
+        expect(validateRut(" ")).toBe(false);
+        expect(validateRut("a")).toBe(false);
+        expect(validateRut("1 2")).toBe(false);
+        expect(validateRut("123456785")).toBe(false);
     });
 
 });
