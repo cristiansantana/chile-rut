@@ -1,10 +1,6 @@
-import {
-    getCheckDigit,
-    validateRut,
-} from ".";
+import { getCheckDigit, validateRut } from ".";
 
 describe("testing index", () => {
-
     test("getCheckDigit of well formed rut ids", () => {
         expect(getCheckDigit("12345678")).toBe("5");
         expect(getCheckDigit("12.345.678")).toBe("5");
@@ -50,5 +46,4 @@ describe("testing index", () => {
         expect(validateRut("1 2")).toBe(false);
         expect(validateRut("123456785")).toBe(false);
     });
-
 });

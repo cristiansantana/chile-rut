@@ -1,16 +1,13 @@
-import { _validateRutFormat, _validateRutIdFormat, _validateRutCheckDigitFormat } from "./validators";
+import { validateRutFormat, validateRutIdFormat, validateRutCheckDigitFormat } from "./validators";
 
-/** @internal */
-export const _getNormalizedRutId = (rutNumber: string) => {
-
-    if (!_validateRutIdFormat(rutNumber)) {
+export const getNormalizedRutId = (rutNumber: string) => {
+    if (!validateRutIdFormat(rutNumber)) {
         throw new Error("Error: RUT Number has non valid format");
     }
 
     const digitRegex = /^\d$/;
 
     const normalizedRut = rutNumber.split("").reduce((previous, current) => {
-
         if (current === "0" && !previous) {
             return "";
         }
@@ -29,24 +26,20 @@ export const _getNormalizedRutId = (rutNumber: string) => {
     return normalizedRut;
 };
 
-/** @internal */
-export const _getNormalizedRutCheckDigit = (checkDigit: string) => {
-
-    if (!_validateRutCheckDigitFormat(checkDigit)) {
+export const getNormalizedRutCheckDigit = (checkDigit: string) => {
+    if (!validateRutCheckDigitFormat(checkDigit)) {
         throw new Error("Error: RUT Check Digit has non valid format");
     }
 
     return checkDigit === "k" ? "K" : checkDigit;
 };
 
-/** @internal */
-export const _getNormalizedRut = (rut: string) => {
-
-    if (!_validateRutFormat(rut)) {
+export const getNormalizedRut = (rut: string) => {
+    if (!validateRutFormat(rut)) {
         throw new Error("Error: RUT has non valid format");
     }
 
     const components = rut.split("-");
 
-    return _getNormalizedRutId(components[0]) + "-" + _getNormalizedRutCheckDigit(components[1]);
+    return getNormalizedRutId(components[0]) + "-" + getNormalizedRutCheckDigit(components[1]);
 };

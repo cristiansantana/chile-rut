@@ -1,35 +1,30 @@
-import { _getNormalizedRut } from "./normalizers";
-import { _getCheckDigit } from "./utilities";
+import { getNormalizedRut } from "./normalizers";
+import { getCheckDigit } from "./utilities";
 
-/** @internal */
-export const _validateRutFormat = (rut: string) => {
+export const validateRutFormat = (rut: string) => {
     const validRegex = /^([0-9]{1,3}(\.[0-9]{3})*|[0-9]{1,3}(,[0-9]{3})*|[0-9]+)-(k|K|[0-9])$/;
     return validRegex.test(rut);
 };
 
-/** @internal */
-export const _validateRutIdFormat = (rut: string) => {
+export const validateRutIdFormat = (rut: string) => {
     const validRegex = /^([0-9]{1,3}(\.[0-9]{3})*|[0-9]{1,3}(,[0-9]{3})*|[0-9]+)$/;
     return validRegex.test(rut);
 };
 
-/** @internal */
-export const _validateRutCheckDigitFormat = (checkDigit: string) => {
+export const validateRutCheckDigitFormat = (checkDigit: string) => {
     const validRegex = /^(k|K|[0-9])$/;
     return validRegex.test(checkDigit);
 };
 
-/** @internal */
-export const _validateRut = (rut: string) => {
-    
-    if (!_validateRutFormat(rut)) {
+export const validateRut = (rut: string) => {
+    if (!validateRutFormat(rut)) {
         return false;
     }
 
-    const normalizedRut = _getNormalizedRut(rut);
+    const normalizedRut = getNormalizedRut(rut);
     const components = normalizedRut.split("-");
     const id = components[0];
     const checkDigit = components[1];
 
-    return checkDigit === _getCheckDigit(id);
+    return checkDigit === getCheckDigit(id);
 };
