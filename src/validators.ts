@@ -1,23 +1,22 @@
-import { getNormalizedRut } from "./normalizers";
+import { validateRutCheckDigitFormat, validateRutFormat, validateRutIdFormat } from "./formats";
+import { getNormalizedRut, isZeroRutId } from "./normalizers";
 import { getCheckDigit } from "./utilities";
 
-export const validateRutFormat = (rut: string) => {
-    const validRegex = /^([0-9]{1,3}(\.[0-9]{3})*|[0-9]{1,3}(,[0-9]{3})*|[0-9]+)-(k|K|[0-9])$/;
-    return validRegex.test(rut);
-};
+export { validateRutCheckDigitFormat, validateRutFormat, validateRutIdFormat };
 
-export const validateRutIdFormat = (rut: string) => {
-    const validRegex = /^([0-9]{1,3}(\.[0-9]{3})*|[0-9]{1,3}(,[0-9]{3})*|[0-9]+)$/;
-    return validRegex.test(rut);
-};
-
-export const validateRutCheckDigitFormat = (checkDigit: string) => {
-    const validRegex = /^(k|K|[0-9])$/;
-    return validRegex.test(checkDigit);
-};
-
+/**
+ * Validates a RUT using its syntax and modulo-11 check digit.
+ *
+ * This does not verify whether the RUT has been legally issued.
+ */
 export const validateRut = (rut: string) => {
     if (!validateRutFormat(rut)) {
+        return false;
+    }
+
+    const rutId = rut.split("-")[0];
+
+    if (isZeroRutId(rutId)) {
         return false;
     }
 

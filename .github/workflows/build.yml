@@ -1,5 +1,5 @@
 name: Build
-run-name: ${{ github.actor }} is running the build and tests
+run-name: ${{ github.actor }} is validating the package
 
 on:
     push:
@@ -7,20 +7,91 @@ on:
     pull_request:
         branches: [main]
 
+permissions:
+    contents: read
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
 jobs:
-    build:
-
+    build-package:
         runs-on: ubuntu-latest
-
-        strategy:
-            matrix:
-                node-version: [16.x, 18.x, 20.x]
-
+        timeout-minutes: 20
         steps:
-            - uses: actions/checkout@v3
-            - name: Use node.js ${{ matrix.node-version }}
-              uses: actions/setup-node@v3
+            - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+            - name: Use Node.js 24
+              uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
               with:
-                node-version: ${{ matrix.node-version }}
+                  node-version: 24.x
+                  cache: npm
             - run: npm ci
-            - run: npm test
+            - run: npm run check
+            - run: npm audit --audit-level=low
+            - name: Pack the package
+              run: |
+                  mkdir -p package
+                  npm pack --json --pack-destination package > package-manifest.json
+                  node test/package-contents.mjs --manifest package-manifest.json
+            - name: Upload the package tarball
+              uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+              with:
+                  name: package-tarball
+                  path: package/*.tgz
+                  if-no-files-found: error
+                  retention-days: 1
+
+    runtime-compatibility:
+        needs: build-package
+        runs-on: ubuntu-latest
+        timeout-minutes: 15
+        strategy:
+            fail-fast: false
+            matrix:
+                node-version: [16.14.2, 18.x, 20.x, 22.x, 24.x, 26.x]
+        steps:
+            - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+              with:
+                  node-version: ${{ matrix.node-version }}
+            - name: Download the package tarball
+              uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+              with:
+                  name: package-tarball
+                  path: package
+            - name: Install and verify the package runtime
+              run: |
+                  consumer_dir="${RUNNER_TEMP}/chile-rut-consumer"
+                  mkdir -p "$consumer_dir"
+                  cd "$consumer_dir"
+                  npm init --yes
+                  npm pkg set type=module
+                  npm install --ignore-scripts --no-audit --no-fund "$GITHUB_WORKSPACE"/package/*.tgz
+                  cp "$GITHUB_WORKSPACE"/test/package-runtime-consumer.mjs index.mjs
+                  node index.mjs
+            - name: Verify the installed TypeScript declarations
+              run: |
+                  consumer_dir="${RUNNER_TEMP}/chile-rut-consumer"
+                  cp test/package-consumer.ts "$consumer_dir/index.ts"
+                  cd "$consumer_dir"
+
+                  if [ "${{ matrix.node-version }}" = "16.14.2" ]; then
+                      npm install --ignore-scripts --no-audit --no-fund --no-save typescript@4.7.4
+                      ./node_modules/.bin/tsc \
+                          --noEmit \
+                          --strict \
+                          --target es2016 \
+                          --module node16 \
+                          --moduleResolution node16 \
+                          index.ts
+                  fi
+
+                  npm install --ignore-scripts --no-audit --no-fund --no-save typescript@5.9.3
+                  ./node_modules/.bin/tsc \
+                      --noEmit \
+                      --strict \
+                      --target es2016 \
+                      --module node16 \
+                      --moduleResolution node16 \
+                      index.ts

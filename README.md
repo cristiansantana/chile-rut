@@ -1,13 +1,15 @@
 # Chile-Rut
-![Build status](https://github.com/cristiansantana/chile-rut/actions/workflows/build.yml/badge.svg)
 
-Chile-Rut is a Javascript (Typescript ready) package for working with the Chilean identification number (known as RUT or RUN).
+[![Build main](https://img.shields.io/github/actions/workflow/status/cristiansantana/chile-rut/build.yml?branch=main&event=push&label=build%20main&logo=github)](https://github.com/cristiansantana/chile-rut/actions/workflows/build.yml?query=branch%3Amain)
 
-## Features
+Chile-Rut is an ESM JavaScript package with TypeScript declarations for working with the Chilean identification number known as RUT or RUN.
 
-- Validate a RUT (Chilean identification number) using its check digit.
-- Obtain the check digit for a RUT.
-- Verify if the format of a RUT is correct.
+It validates syntax and modulo-11 check digits. It does **not** verify whether a RUT has been legally issued or currently exists.
+
+## Requirements
+
+- Node.js 16.14 or newer.
+- An environment that supports ECMAScript modules (ESM).
 
 ## Installation
 
@@ -17,66 +19,162 @@ npm install @cristiansantana/chile-rut
 
 ## Usage
 
-### Get CheckDigit
-
-Use the `getCheckDigit` function with a RUT Id as parameter.
-
-#### Example without format validation
 ```js
-import { getCheckDigit } from "@cristiansantana/chile-rut";
-
-const rutId = "12345678";
-
-try {
-    const digit = getCheckDigit(rutId);
-    console.log(digit); // -> output expected: 5
-} catch (error) {
-    // Error: rutId has non valid format
-    // ...   
-}
+import { getCheckDigit, validateRut } from "@cristiansantana/chile-rut";
 ```
 
-#### Example with format validation
-```js
-import { getCheckDigit, validateRutIdFormat } from "@cristiansantana/chile-rut";
-
-const rutId = "12345678";
-
-if (validateRutIdFormat(rutId)) {
-    const digit = getCheckDigit(rutId);
-    console.log(digit); // -> output expected: 5
-}
-else {
-    // Error: rutId has non valid format
-    // ...
-}
-```
-
-#### Supported formats
-
-`getCheckDigit` support the parameter rutId as:
-
-- "12345678"
-- "12.345.678"
-- "12,345,678"
-- "012.345.678"
+The package root is the only public entry point. Imports from internal `src` or `dist` paths are not supported.
 
 ### Validate a RUT
 
-Use the `validateRut` function with a RUT as parameter for validate it. This function **does not test/verify the actual existence of the RUT**, it only checks that it is well-formed
+Pass the complete RUT, including the hyphen and check digit, to `validateRut`. It returns a boolean and does not throw for malformed input.
 
 ```js
-import { validateRut } from "@cristiansantana/chile-rut";
+validateRut("12.345.678-5"); // true
+validateRut("12345678-5"); // true
+validateRut("18.765.002-K"); // true
 
-console.log(validateRut("12345678-5")); // -> output expected: true
-console.log(validateRut("12345678-6")); // -> output expected: false
+validateRut("12.345.678-6"); // false: incorrect check digit
+validateRut("12 345 678-5"); // false: unsupported format
 ```
 
-#### Supported formats
+Validation confirms that the syntax and modulo-11 check digit are correct. It does not confirm that the RUT has been legally issued or currently exists.
 
-`validateRut` support the parameter rut as:
+### Get a check digit
 
-- "12345678-5" <- without thousands separator
-- "12.345.678-5" <- dots as the thousands separator
-- "12,345,678-5" <- commas as the thousands separator
-- "012345678-5" <- leading with zeros (also work with thousands separator)
+Pass the identifier without the hyphen or check digit to `getCheckDigit`. The identifier can be written with or without grouping separators.
+
+```js
+getCheckDigit("12.345.678"); // "5"
+getCheckDigit("12345678"); // "5"
+getCheckDigit("18.765.002"); // "K"
+```
+
+You can use the result to build a complete RUT:
+
+```js
+const rutId = "20.123.456";
+const checkDigit = getCheckDigit(rutId); // "5"
+const rut = `${rutId}-${checkDigit}`; // "20.123.456-5"
+```
+
+### Edge cases
+
+An identifier consisting only of zeros is not considered a valid RUT. Validation returns `false`, while calculating its check digit throws an `Error`.
+
+```js
+validateRut("0-0"); // false
+getCheckDigit("0"); // throws
+```
+
+## API
+
+### `getCheckDigit(rutId)`
+
+Calculates the modulo-11 check digit for a RUT identifier and returns it as a string. It throws an `Error` when the identifier has an unsupported format or consists only of zeros.
+
+```js
+getCheckDigit("12345678"); // "5"
+getCheckDigit("18.765.002"); // "K"
+getCheckDigit("19.876.543"); // "0"
+getCheckDigit("0"); // throws
+```
+
+### `validateRut(rut)`
+
+Returns `true` when the complete RUT has a supported format and the correct check digit. It returns `false` for malformed RUTs, incorrect check digits and identifiers consisting only of zeros.
+
+```js
+validateRut("12345678-5"); // true
+validateRut("18.765.002-k"); // true
+validateRut("19.876.543-0"); // true
+validateRut("0-0"); // false
+```
+
+### `validateRutFormat(rut)`
+
+Checks syntax only. It does not calculate the check digit, so a value can have a valid format while not being a valid RUT.
+
+```js
+validateRutFormat("12.345.678-5"); // true
+validateRutFormat("123456785"); // false
+validateRutFormat("0-0"); // true (syntactically valid)
+```
+
+### `validateRutIdFormat(rutId)`
+
+Checks whether an identifier uses a supported syntax. This is a format check only; `"0"` has a valid format even though `getCheckDigit("0")` throws.
+
+```js
+validateRutIdFormat("12345678"); // true
+validateRutIdFormat("12.345.678"); // true
+validateRutIdFormat("12.345,678"); // false
+```
+
+### `validateRutCheckDigitFormat(checkDigit)`
+
+Returns `true` for one numeric digit or the letter `K`, in either case.
+
+```js
+validateRutCheckDigitFormat("5"); // true
+validateRutCheckDigitFormat("K"); // true
+validateRutCheckDigitFormat("k"); // true
+validateRutCheckDigitFormat("10"); // false
+```
+
+## Supported formats
+
+RUT identifiers can be unseparated or grouped consistently with dots or commas. Leading zeros are accepted and removed before calculating the check digit.
+
+```text
+12345678
+12.345.678
+12,345,678
+012345678
+00.012.345.678
+```
+
+Complete RUTs use a hyphen before the check digit:
+
+```text
+12345678-5
+12.345.678-5
+12,345,678-5
+18.765.002-K
+18.765.002-k
+```
+
+Mixed or incomplete grouping separators are rejected.
+
+## Development
+
+Consuming the published package requires Node.js 16.14 or newer. Developing and building the package requires Node.js 24.
+
+Select the development version, install the locked dependencies and run the complete release check:
+
+```sh
+nvm use
+npm ci
+npm run check
+```
+
+Individual commands are also available:
+
+```sh
+npm run format-check
+npm run type-check
+npm test
+npm run test-coverage
+npm run build
+npm run smoke-test
+npm run package-check
+```
+
+`npm run check` also verifies the exact list of files that would be published. Before preparing a release, run `npm audit --audit-level=low`. CI builds the tarball once with Node.js 24, then installs and exercises that exact artifact, including its TypeScript declarations, on Node.js 16.14, 18, 20, 22, 24 and 26. Publishing and tagging remain manual steps.
+
+## Project information
+
+- [Changelog](./CHANGELOG.md)
+- [Issue tracker](https://github.com/cristiansantana/chile-rut/issues)
+- [Source repository](https://github.com/cristiansantana/chile-rut)
+- [ISC license](./LICENSE)

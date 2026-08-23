@@ -1,9 +1,15 @@
-import { validateRutIdFormat } from "./validators";
+import { INVALID_RUT_ID_MESSAGE } from "./errors";
+import { validateRutIdFormat } from "./formats";
 import { getNormalizedRutId } from "./normalizers";
 
+/**
+ * Calculates the modulo-11 check digit for a supported RUT identifier.
+ *
+ * @throws When the identifier has an invalid format or consists only of zeros.
+ */
 export const getCheckDigit = (rutId: string) => {
     if (!validateRutIdFormat(rutId)) {
-        throw new Error("Error: Rut Id has a non valid format");
+        throw new Error(INVALID_RUT_ID_MESSAGE);
     }
 
     const normalizedRutId = getNormalizedRutId(rutId);
