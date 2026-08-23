@@ -56,6 +56,7 @@ jobs:
             matrix:
                 node-version: [16.14.2, 18.x, 20.x, 22.x, 24.x]
         steps:
+            - uses: actions/checkout@v4
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v4
               with:
@@ -73,4 +74,5 @@ jobs:
                   npm init --yes
                   npm pkg set type=module
                   npm install --ignore-scripts --no-audit --no-fund "$GITHUB_WORKSPACE"/package/*.tgz
-                  node --input-type=module -e "import('@cristiansantana/chile-rut').then(({ getCheckDigit, validateRut }) => { if (getCheckDigit('12345678') !== '5' || !validateRut('12345678-5') || validateRut('12345678-4')) throw new Error('The installed package did not produce the expected results'); })"
+                  cp "$GITHUB_WORKSPACE"/test/package-runtime-consumer.mjs index.mjs
+                  node index.mjs
