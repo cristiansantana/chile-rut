@@ -1,4 +1,6 @@
-import { validateRutFormat, validateRutIdFormat, validateRutCheckDigitFormat } from "./validators";
+import { validateRutCheckDigitFormat, validateRutFormat, validateRutIdFormat } from "./formats";
+
+export const isZeroRutId = (rutNumber: string) => /^0+$/.test(rutNumber.replace(/[.,]/g, ""));
 
 export const getNormalizedRutId = (rutNumber: string) => {
     if (!validateRutIdFormat(rutNumber)) {
