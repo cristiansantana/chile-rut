@@ -8,24 +8,69 @@ on:
         branches: [main]
 
 jobs:
-    build:
-
+    build-package:
         runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - name: Use Node.js 24
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 24.x
+                  cache: npm
+            - run: npm ci
+            - run: npm run check
+            - run: npm audit --audit-level=moderate
+            - name: Pack the package
+              run: |
+                  mkdir -p package
+                  npm pack --pack-destination package
+            - name: Verify the packed TypeScript declarations
+              run: |
+                  consumer_dir="${RUNNER_TEMP}/chile-rut-types-consumer"
+                  mkdir -p "$consumer_dir"
+                  cp test/package-consumer.ts "$consumer_dir/index.ts"
+                  cd "$consumer_dir"
+                  npm init --yes
+                  npm pkg set type=module
+                  npm install --ignore-scripts --no-audit --no-fund "$GITHUB_WORKSPACE"/package/*.tgz
+                  "$GITHUB_WORKSPACE"/node_modules/.bin/tsc \
+                      --noEmit \
+                      --strict \
+                      --target es2016 \
+                      --module node16 \
+                      --moduleResolution node16 \
+                      index.ts
+            - name: Upload the package tarball
+              uses: actions/upload-artifact@v4
+              with:
+                  name: package-tarball
+                  path: package/*.tgz
+                  if-no-files-found: error
+                  retention-days: 1
 
+    runtime-compatibility:
+        needs: build-package
+        runs-on: ubuntu-latest
         strategy:
             fail-fast: false
             matrix:
                 node-version: [16.14.2, 18.x, 20.x, 22.x, 24.x]
-
         steps:
-            - uses: actions/checkout@v4
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v4
               with:
                   node-version: ${{ matrix.node-version }}
-                  cache: npm
-            - run: npm ci
-            - run: npm run check
-            - run: npm audit --audit-level=high
-            - if: matrix.node-version == '24.x'
-              run: npm pack --dry-run --json
+            - name: Download the package tarball
+              uses: actions/download-artifact@v4
+              with:
+                  name: package-tarball
+                  path: package
+            - name: Verify the installed package
+              run: |
+                  consumer_dir="${RUNNER_TEMP}/chile-rut-runtime-consumer"
+                  mkdir -p "$consumer_dir"
+                  cd "$consumer_dir"
+                  npm init --yes
+                  npm pkg set type=module
+                  npm install --ignore-scripts --no-audit --no-fund "$GITHUB_WORKSPACE"/package/*.tgz
+                  node --input-type=module -e "import('@cristiansantana/chile-rut').then(({ getCheckDigit, validateRut }) => { if (getCheckDigit('12345678') !== '5' || !validateRut('12345678-5') || validateRut('12345678-4')) throw new Error('The installed package did not produce the expected results'); })"

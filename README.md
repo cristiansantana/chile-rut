@@ -146,9 +146,12 @@ Mixed or incomplete grouping separators are rejected.
 
 ## Development
 
-Install the locked dependencies and run the complete release check:
+Consuming the published package requires Node.js 16.14 or newer. Developing and building the package requires Node.js 24.
+
+Select the development version, install the locked dependencies and run the complete release check:
 
 ```sh
+nvm use
 npm ci
 npm run check
 ```
@@ -164,7 +167,7 @@ npm run build
 npm run smoke-test
 ```
 
-Before preparing a release, run `npm audit --audit-level=high` and inspect the package with `npm pack --dry-run --json`. Publishing and tagging remain manual steps.
+Before preparing a release, run `npm audit --audit-level=moderate` and inspect the package with `npm pack --dry-run --json`. CI builds the tarball once with Node.js 24, then installs and exercises that exact artifact on Node.js 16.14, 18, 20, 22 and 24. Publishing and tagging remain manual steps.
 
 ## Project information
 

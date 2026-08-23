@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- Development and package builds now use Node.js 24 while the published library continues to support Node.js 16.14 and newer.
+- CI now builds one tarball and verifies the installed artifact across Node.js 16, 18, 20, 22 and 24, including its TypeScript declarations.
+- Updated the build toolchain and raised dependency auditing to moderate severity.
+
 ## [1.0.9] - 2026-08-23
 
 ### Fixed
