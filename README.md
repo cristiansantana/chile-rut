@@ -21,10 +21,48 @@ npm install @cristiansantana/chile-rut
 
 ```js
 import { getCheckDigit, validateRut } from "@cristiansantana/chile-rut";
+```
 
-getCheckDigit("12.345.678"); // "5"
+### Validate a RUT
+
+Pass the complete RUT, including the hyphen and check digit, to `validateRut`. It returns a boolean and does not throw for malformed input.
+
+```js
 validateRut("12.345.678-5"); // true
-validateRut("12.345.678-6"); // false
+validateRut("12345678-5"); // true
+validateRut("18.765.002-K"); // true
+
+validateRut("12.345.678-6"); // false: incorrect check digit
+validateRut("12 345 678-5"); // false: unsupported format
+```
+
+Validation confirms that the syntax and modulo-11 check digit are correct. It does not confirm that the RUT has been legally issued or currently exists.
+
+### Get a check digit
+
+Pass the identifier without the hyphen or check digit to `getCheckDigit`. The identifier can be written with or without grouping separators.
+
+```js
+getCheckDigit("12.345.678"); // "5"
+getCheckDigit("12345678"); // "5"
+getCheckDigit("18.765.002"); // "K"
+```
+
+You can use the result to build a complete RUT:
+
+```js
+const rutId = "20.123.456";
+const checkDigit = getCheckDigit(rutId); // "5"
+const rut = `${rutId}-${checkDigit}`; // "20.123.456-5"
+```
+
+### Edge cases
+
+An identifier consisting only of zeros is not considered a valid RUT. Validation returns `false`, while calculating its check digit throws an `Error`.
+
+```js
+validateRut("0-0"); // false
+getCheckDigit("0"); // throws
 ```
 
 ## API
@@ -35,8 +73,8 @@ Calculates the modulo-11 check digit for a RUT identifier and returns it as a st
 
 ```js
 getCheckDigit("12345678"); // "5"
-getCheckDigit("6"); // "K"
-getCheckDigit("14"); // "0"
+getCheckDigit("18.765.002"); // "K"
+getCheckDigit("19.876.543"); // "0"
 getCheckDigit("0"); // throws
 ```
 
@@ -46,8 +84,8 @@ Returns `true` when the complete RUT has a supported format and the correct chec
 
 ```js
 validateRut("12345678-5"); // true
-validateRut("6-k"); // true
-validateRut("14-0"); // true
+validateRut("18.765.002-k"); // true
+validateRut("19.876.543-0"); // true
 validateRut("0-0"); // false
 ```
 
@@ -100,8 +138,8 @@ Complete RUTs use a hyphen before the check digit:
 12345678-5
 12.345.678-5
 12,345,678-5
-6-K
-6-k
+18.765.002-K
+18.765.002-k
 ```
 
 Mixed or incomplete grouping separators are rejected.
