@@ -170,7 +170,7 @@ npm run smoke-test
 npm run package-check
 ```
 
-`npm run check` also verifies the exact list of files that would be published. Before preparing a release, run `npm audit --audit-level=moderate`. CI builds the tarball once with Node.js 24, then installs and exercises that exact artifact, including its TypeScript declarations, on Node.js 16.14, 18, 20, 22 and 24. Publishing and tagging remain manual steps.
+`npm run check` also verifies the exact list of files that would be published. Before preparing a release, run `npm audit --audit-level=low`. CI builds the tarball once with Node.js 24, then installs and exercises that exact artifact, including its TypeScript declarations, on Node.js 16.14, 18, 20, 22, 24 and 26. Publishing and tagging remain manual steps.
 
 ## Project information
 

@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- Non-string runtime inputs are now handled consistently without changing the public TypeScript signatures.
+- Invalid-input errors now use normalized messages without a duplicated `Error:` prefix.
+- Updated the build-time `esbuild` dependency to address a low-severity development-server vulnerability.
+
+### Changed
+
+- Simplified internal RUT normalization while preserving the supported string formats.
+- Replaced exhaustive invariant loops with focused success, failure and installed-artifact compatibility cases.
+- Hardened CI and extended installed-package verification through Node.js 26.
+
 ## [1.0.9] - 2026-08-23
 
 ### Fixed

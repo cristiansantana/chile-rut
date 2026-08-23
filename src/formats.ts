@@ -5,14 +5,15 @@ const validRutCheckDigitRegex = /^(k|K|[0-9])$/;
 /**
  * Checks whether a complete RUT uses one of the supported syntactic formats.
  */
-export const validateRutFormat = (rut: string) => validRutRegex.test(rut);
+export const validateRutFormat = (rut: string) => typeof rut === "string" && validRutRegex.test(rut);
 
 /**
  * Checks whether a RUT identifier uses one of the supported syntactic formats.
  */
-export const validateRutIdFormat = (rut: string) => validRutIdRegex.test(rut);
+export const validateRutIdFormat = (rut: string) => typeof rut === "string" && validRutIdRegex.test(rut);
 
 /**
  * Checks whether a value is a single numeric check digit or the letter K.
  */
-export const validateRutCheckDigitFormat = (checkDigit: string) => validRutCheckDigitRegex.test(checkDigit);
+export const validateRutCheckDigitFormat = (checkDigit: string) =>
+    typeof checkDigit === "string" && validRutCheckDigitRegex.test(checkDigit);

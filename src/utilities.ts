@@ -1,3 +1,4 @@
+import { INVALID_RUT_ID_MESSAGE } from "./errors";
 import { validateRutIdFormat } from "./formats";
 import { getNormalizedRutId } from "./normalizers";
 
@@ -8,7 +9,7 @@ import { getNormalizedRutId } from "./normalizers";
  */
 export const getCheckDigit = (rutId: string) => {
     if (!validateRutIdFormat(rutId)) {
-        throw new Error("Error: Rut Id has a non valid format");
+        throw new Error(INVALID_RUT_ID_MESSAGE);
     }
 
     const normalizedRutId = getNormalizedRutId(rutId);

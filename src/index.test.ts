@@ -14,9 +14,29 @@ describe("getCheckDigit", () => {
         expect(getCheckDigit(rutId)).toBe(expected);
     });
 
-    test.each(["", "a", "12.34.567", "12.345,678", "0", "000", "0.000"])("throws for invalid identifier %p", (rutId) => {
-        expect(() => getCheckDigit(rutId)).toThrow();
-    });
+    test.each(["", "a", "12.34.567", "12.345,678", "0", "000", "0.000"])(
+        "throws a normalized error for invalid identifier %p",
+        (rutId) => {
+            expect(() => getCheckDigit(rutId)).toThrow("RUT ID has an invalid format");
+        },
+    );
+
+    test.each([undefined, null, 12345678, {}, []] as unknown[])(
+        "throws a normalized error for non-string identifier %p",
+        (rutId) => {
+            let thrown: unknown;
+
+            try {
+                getCheckDigit(rutId as string);
+            } catch (error) {
+                thrown = error;
+            }
+
+            expect(thrown).toBeInstanceOf(Error);
+            expect(thrown).toMatchObject({ name: "Error", message: "RUT ID has an invalid format" });
+            expect(String(thrown)).toBe("Error: RUT ID has an invalid format");
+        },
+    );
 });
 
 describe("format validators", () => {
@@ -55,6 +75,12 @@ describe("format validators", () => {
     test.each(["", " ", "10", "X", "k5"])("rejects check digit format %p", (checkDigit) => {
         expect(validateRutCheckDigitFormat(checkDigit)).toBe(false);
     });
+
+    test.each([undefined, null, 12345678, {}, []] as unknown[])("rejects non-string value %p", (value) => {
+        expect(validateRutFormat(value as string)).toBe(false);
+        expect(validateRutIdFormat(value as string)).toBe(false);
+        expect(validateRutCheckDigitFormat(value as string)).toBe(false);
+    });
 });
 
 describe("validateRut", () => {
@@ -85,5 +111,9 @@ describe("validateRut", () => {
 
     test.each(["0-0", "000-0", "0.000-0", "0,000-0", "00000000-0"])("returns false for zero-only RUT %s", (rut) => {
         expect(validateRut(rut)).toBe(false);
+    });
+
+    test.each([undefined, null, 12345678, {}, []] as unknown[])("returns false for non-string value %p", (value) => {
+        expect(validateRut(value as string)).toBe(false);
     });
 });

@@ -9,11 +9,11 @@ describe("internal normalizers", () => {
         expect(getNormalizedRut("00.012.345.678-k")).toBe("12345678-K");
     });
 
-    test("preserves existing errors for unsupported inputs", () => {
-        expect(() => getNormalizedRutId("12.345,678")).toThrow("Error: RUT Number has non valid format");
-        expect(() => getNormalizedRutId("0")).toThrow("Error: RUT Number has non valid format");
-        expect(() => getNormalizedRutCheckDigit("X")).toThrow("Error: RUT Check Digit has non valid format");
-        expect(() => getNormalizedRut("123456785")).toThrow("Error: RUT has non valid format");
+    test("throws normalized errors for unsupported inputs", () => {
+        expect(() => getNormalizedRutId("12.345,678")).toThrow("RUT ID has an invalid format");
+        expect(() => getNormalizedRutId("0")).toThrow("RUT ID has an invalid format");
+        expect(() => getNormalizedRutCheckDigit("X")).toThrow("RUT check digit has an invalid format");
+        expect(() => getNormalizedRut("123456785")).toThrow("RUT has an invalid format");
     });
 
     test("detects identifiers that consist only of zeros", () => {

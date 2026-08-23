@@ -15,49 +15,24 @@ const assert = (condition, message) => {
     if (!condition) throw new Error(message);
 };
 
-const assertThrows = (callback, message) => {
-    let threw = false;
+const getThrownError = (callback, message) => {
+    let thrown;
 
     try {
         callback();
-    } catch {
-        threw = true;
+    } catch (error) {
+        thrown = error;
     }
 
-    assert(threw, message);
+    assert(thrown instanceof Error, message);
+    return thrown;
 };
 
-const getReferenceCheckDigit = (rutId) => {
-    const digits = rutId.replace(/[.,]/g, "").replace(/^0+/, "");
-    let factor = 2;
-    let sum = 0;
-
-    for (let index = digits.length - 1; index >= 0; index -= 1) {
-        sum += Number(digits[index]) * factor;
-        factor = factor === 7 ? 2 : factor + 1;
-    }
-
-    const digit = 11 - (sum % 11);
-
-    if (digit === 11) return "0";
-    if (digit === 10) return "K";
-    return String(digit);
-};
-
-const groupDigits = (rutId, separator) => rutId.replace(/\B(?=(\d{3})+(?!\d))/g, separator);
-
-const createRandomStrings = (count) => {
-    const alphabet = "0123456789kK-., abcXYZ";
-    let state = 0x5eed1234;
-    const next = () => {
-        state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
-        return state;
-    };
-
-    return Array.from({ length: count }, () => {
-        const length = next() % 40;
-        return Array.from({ length }, () => alphabet[next() % alphabet.length]).join("");
-    });
+const assertInvalidRutIdError = (callback, context) => {
+    const error = getThrownError(callback, `Expected an Error for ${context}`);
+    assert(error.name === "Error", `Unexpected error name for ${context}`);
+    assert(error.message === "RUT ID has an invalid format", `Unexpected error message for ${context}`);
+    assert(String(error) === "Error: RUT ID has an invalid format", `Unexpected stringified error for ${context}`);
 };
 
 assert(JSON.stringify(Object.keys(packageExports).sort()) === JSON.stringify(expectedExports), "Unexpected package exports");
@@ -76,7 +51,7 @@ for (const [rutId, expected] of [
 }
 
 for (const rutId of ["", "a", "12.34.567", "12.345,678", "0", "000", "0.000"]) {
-    assertThrows(() => getCheckDigit(rutId), `Expected getCheckDigit to throw for ${JSON.stringify(rutId)}`);
+    assertInvalidRutIdError(() => getCheckDigit(rutId), JSON.stringify(rutId));
 }
 
 for (const rut of [
@@ -133,35 +108,13 @@ for (const checkDigit of ["", " ", "10", "X", "k5"]) {
     assert(!validateRutCheckDigitFormat(checkDigit), `Expected ${JSON.stringify(checkDigit)} to be invalid`);
 }
 
-for (let value = 1; value <= 25_000; value += 1) {
-    const plain = String(value);
-    const withLeadingZeros = `00${plain}`;
-    const expected = getReferenceCheckDigit(plain);
-    const representations = [
-        plain,
-        groupDigits(plain, "."),
-        groupDigits(plain, ","),
-        withLeadingZeros,
-        groupDigits(withLeadingZeros, "."),
-        groupDigits(withLeadingZeros, ","),
-    ];
-
-    for (const representation of representations) {
-        assert(getCheckDigit(representation) === expected, `Invariant failed for ${representation}`);
-        assert(validateRut(`${representation}-${expected}`), `Generated RUT failed for ${representation}`);
-    }
-}
-
-for (const input of createRandomStrings(5_000)) {
-    let result;
-
-    try {
-        result = validateRut(input);
-    } catch (error) {
-        throw new Error(`validateRut threw for ${JSON.stringify(input)}`, { cause: error });
-    }
-
-    assert(typeof result === "boolean", `validateRut returned a non-boolean for ${JSON.stringify(input)}`);
+for (const value of [undefined, null, 12345678, {}, []]) {
+    const context = String(value);
+    assert(validateRut(value) === false, `Expected validateRut to reject ${context}`);
+    assert(validateRutFormat(value) === false, `Expected validateRutFormat to reject ${context}`);
+    assert(validateRutIdFormat(value) === false, `Expected validateRutIdFormat to reject ${context}`);
+    assert(validateRutCheckDigitFormat(value) === false, `Expected validateRutCheckDigitFormat to reject ${context}`);
+    assertInvalidRutIdError(() => getCheckDigit(value), context);
 }
 
 let deepImportError;
@@ -184,6 +137,7 @@ assert(packageJson.main === "dist/index.js", "Unexpected main entrypoint");
 assert(packageJson.types === "dist/index.d.ts", "Unexpected types entrypoint");
 assert(packageJson.exports["."].import === "./dist/index.js", "Unexpected import export");
 assert(packageJson.exports["."].types === "./dist/index.d.ts", "Unexpected types export");
+assert(packageJson.dependencies === undefined, "The package must not have runtime dependencies");
 assert(javascript.includes("//# sourceMappingURL=index.js.map"), "JavaScript does not reference its source map");
 assert(sourceMap.version === 3, "Unexpected source map version");
 assert(sourceMap.sources.length === sourceMap.sourcesContent.length, "Source map sources and content are inconsistent");

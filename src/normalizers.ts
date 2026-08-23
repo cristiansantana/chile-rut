@@ -1,28 +1,17 @@
+import { INVALID_RUT_CHECK_DIGIT_MESSAGE, INVALID_RUT_ID_MESSAGE, INVALID_RUT_MESSAGE } from "./errors";
 import { validateRutCheckDigitFormat, validateRutFormat, validateRutIdFormat } from "./formats";
 
 export const isZeroRutId = (rutNumber: string) => /^0+$/.test(rutNumber.replace(/[.,]/g, ""));
 
 export const getNormalizedRutId = (rutNumber: string) => {
     if (!validateRutIdFormat(rutNumber)) {
-        throw new Error("Error: RUT Number has non valid format");
+        throw new Error(INVALID_RUT_ID_MESSAGE);
     }
 
-    const digitRegex = /^\d$/;
-
-    const normalizedRut = rutNumber.split("").reduce((previous, current) => {
-        if (current === "0" && !previous) {
-            return "";
-        }
-
-        if (digitRegex.test(current)) {
-            return previous + current;
-        }
-
-        return previous;
-    }, "" as string);
+    const normalizedRut = rutNumber.replace(/[.,]/g, "").replace(/^0+/, "");
 
     if (normalizedRut === "") {
-        throw new Error("Error: RUT Number has non valid format");
+        throw new Error(INVALID_RUT_ID_MESSAGE);
     }
 
     return normalizedRut;
@@ -30,7 +19,7 @@ export const getNormalizedRutId = (rutNumber: string) => {
 
 export const getNormalizedRutCheckDigit = (checkDigit: string) => {
     if (!validateRutCheckDigitFormat(checkDigit)) {
-        throw new Error("Error: RUT Check Digit has non valid format");
+        throw new Error(INVALID_RUT_CHECK_DIGIT_MESSAGE);
     }
 
     return checkDigit === "k" ? "K" : checkDigit;
@@ -38,7 +27,7 @@ export const getNormalizedRutCheckDigit = (checkDigit: string) => {
 
 export const getNormalizedRut = (rut: string) => {
     if (!validateRutFormat(rut)) {
-        throw new Error("Error: RUT has non valid format");
+        throw new Error(INVALID_RUT_MESSAGE);
     }
 
     const components = rut.split("-");

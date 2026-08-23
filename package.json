@@ -1,6 +1,7 @@
 {
     "name": "@cristiansantana/chile-rut",
     "version": "1.0.9",
+    "packageManager": "npm@11.17.0",
     "description": "Javascript (Typescript ready) chilean RUT toolset: Validate, generate and verify format.",
     "engines": {
         "node": ">= 16.14"
@@ -58,6 +59,9 @@
         "typescript",
         "ts"
     ],
+    "overrides": {
+        "esbuild": "0.28.2"
+    },
     "devDependencies": {
         "@types/jest": "^29.5.14",
         "@types/node": "^16.18.126",
