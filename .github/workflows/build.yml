@@ -23,23 +23,8 @@ jobs:
             - name: Pack the package
               run: |
                   mkdir -p package
-                  npm pack --pack-destination package
-            - name: Verify the packed TypeScript declarations
-              run: |
-                  consumer_dir="${RUNNER_TEMP}/chile-rut-types-consumer"
-                  mkdir -p "$consumer_dir"
-                  cp test/package-consumer.ts "$consumer_dir/index.ts"
-                  cd "$consumer_dir"
-                  npm init --yes
-                  npm pkg set type=module
-                  npm install --ignore-scripts --no-audit --no-fund "$GITHUB_WORKSPACE"/package/*.tgz
-                  "$GITHUB_WORKSPACE"/node_modules/.bin/tsc \
-                      --noEmit \
-                      --strict \
-                      --target es2016 \
-                      --module node16 \
-                      --moduleResolution node16 \
-                      index.ts
+                  npm pack --json --pack-destination package > package-manifest.json
+                  node test/package-contents.mjs --manifest package-manifest.json
             - name: Upload the package tarball
               uses: actions/upload-artifact@v4
               with:
@@ -66,9 +51,9 @@ jobs:
               with:
                   name: package-tarball
                   path: package
-            - name: Verify the installed package
+            - name: Install and verify the package runtime
               run: |
-                  consumer_dir="${RUNNER_TEMP}/chile-rut-runtime-consumer"
+                  consumer_dir="${RUNNER_TEMP}/chile-rut-consumer"
                   mkdir -p "$consumer_dir"
                   cd "$consumer_dir"
                   npm init --yes
@@ -76,3 +61,28 @@ jobs:
                   npm install --ignore-scripts --no-audit --no-fund "$GITHUB_WORKSPACE"/package/*.tgz
                   cp "$GITHUB_WORKSPACE"/test/package-runtime-consumer.mjs index.mjs
                   node index.mjs
+            - name: Verify the installed TypeScript declarations
+              run: |
+                  consumer_dir="${RUNNER_TEMP}/chile-rut-consumer"
+                  cp test/package-consumer.ts "$consumer_dir/index.ts"
+                  cd "$consumer_dir"
+
+                  if [ "${{ matrix.node-version }}" = "16.14.2" ]; then
+                      npm install --ignore-scripts --no-audit --no-fund --no-save typescript@4.7.4
+                      ./node_modules/.bin/tsc \
+                          --noEmit \
+                          --strict \
+                          --target es2016 \
+                          --module node16 \
+                          --moduleResolution node16 \
+                          index.ts
+                  fi
+
+                  npm install --ignore-scripts --no-audit --no-fund --no-save typescript@5.9.3
+                  ./node_modules/.bin/tsc \
+                      --noEmit \
+                      --strict \
+                      --target es2016 \
+                      --module node16 \
+                      --moduleResolution node16 \
+                      index.ts

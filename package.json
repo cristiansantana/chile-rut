@@ -8,6 +8,18 @@
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "type": "module",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js",
+            "default": "./dist/index.js"
+        }
+    },
+    "files": [
+        "dist",
+        "CHANGELOG.md"
+    ],
+    "sideEffects": false,
     "scripts": {
         "build": "tsup",
         "type-check": "tsc --noEmit --project tsconfig.build.json",
@@ -16,7 +28,8 @@
         "format-check": "prettier \"**/*.{js,mjs,ts,json}\" --check --config .prettierrc.json",
         "format-write": "prettier \"**/*.{js,mjs,ts,json}\" --write --config .prettierrc.json",
         "smoke-test": "node -e \"import('./dist/index.js').then(({ getCheckDigit, validateRut }) => { if (getCheckDigit('12345678') !== '5' || !validateRut('12345678-5')) process.exit(1); })\"",
-        "check": "npm run format-check && npm run type-check && npm run test-coverage && npm run build && npm run smoke-test",
+        "package-check": "node test/package-contents.mjs",
+        "check": "npm run format-check && npm run type-check && npm run test-coverage && npm run build && npm run smoke-test && npm run package-check",
         "prepublishOnly": "npm run check"
     },
     "author": {
