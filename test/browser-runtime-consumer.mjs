@@ -1,7 +1,7 @@
 import { createReadStream, existsSync } from "node:fs";
 import { createServer } from "node:http";
 import { extname, normalize, resolve } from "node:path";
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 
 const consumerDirectory = process.argv[2];
 const testDirectory = new URL(".", import.meta.url).pathname;
@@ -28,6 +28,32 @@ const browser = browserCandidates.find((candidate) => spawnSync(candidate, ["--v
 if (!browser) {
     throw new Error(`No supported Chrome or Chromium executable found (${browserCandidates.join(", ")})`);
 }
+
+const runBrowser = (url) =>
+    new Promise((resolveBrowser, rejectBrowser) => {
+        const browserProcess = spawn(browser, ["--headless=new", "--disable-gpu", "--no-sandbox", "--dump-dom", url]);
+        let stdout = "";
+        let stderr = "";
+        const timeout = setTimeout(() => {
+            browserProcess.kill();
+            rejectBrowser(new Error("Browser did not finish within 60 seconds"));
+        }, 60_000);
+
+        browserProcess.stdout.on("data", (chunk) => {
+            stdout += chunk;
+        });
+        browserProcess.stderr.on("data", (chunk) => {
+            stderr += chunk;
+        });
+        browserProcess.on("error", (error) => {
+            clearTimeout(timeout);
+            rejectBrowser(error);
+        });
+        browserProcess.on("close", (status) => {
+            clearTimeout(timeout);
+            resolveBrowser({ status, stdout, stderr });
+        });
+    });
 
 const resolveRequestPath = (pathname) => {
     if (pathname === "/") return resolve(testDirectory, "browser-runtime-consumer.html");
@@ -56,13 +82,7 @@ await new Promise((resolveServer) => server.listen(0, "127.0.0.1", resolveServer
 
 try {
     const { port } = server.address();
-    const result = spawnSync(
-        browser,
-        ["--headless=new", "--disable-gpu", "--no-sandbox", "--dump-dom", `http://127.0.0.1:${port}/`],
-        {
-            encoding: "utf8",
-        },
-    );
+    const result = await runBrowser(`http://127.0.0.1:${port}/`);
 
     if (result.status !== 0) {
         throw new Error(`Browser exited with status ${result.status}: ${result.stderr}`);
