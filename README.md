@@ -1,10 +1,30 @@
 # Chile-Rut
 
+[English](./README.md) | [Español](./README.es.md)
+
 [![Build main](https://img.shields.io/github/actions/workflow/status/cristiansantana/chile-rut/build.yml?branch=main&event=push&label=build%20main&logo=github)](https://github.com/cristiansantana/chile-rut/actions/workflows/build.yml?query=branch%3Amain)
+[![Node.js](https://img.shields.io/node/v/@cristiansantana/chile-rut?logo=node.js&label=Node.js)](https://www.npmjs.com/package/@cristiansantana/chile-rut)
+[![Environment](https://img.shields.io/badge/environment-Browser%20%2B%20Node.js-2ea44f?logo=javascript)](#compatibility)
 
 Chile-Rut is an ESM JavaScript package with TypeScript declarations for working with the Chilean identification number known as RUT or RUN.
 
 It validates syntax and modulo-11 check digits. It does **not** verify whether a RUT has been legally issued or currently exists.
+
+## Compatibility
+
+Chile-Rut works in both modern browsers and Node.js applications.
+
+| Environment | Compatibility |
+| --- | --- |
+| Modern browsers | ✅ |
+| Node.js 26.x | ✅ |
+| Node.js 24.x | ✅ |
+| Node.js 22.x | ✅ |
+| Node.js 20.x | ✅ |
+| Node.js 18.x | ✅ |
+| Node.js 16.14+ | ✅ |
+
+For new production applications, use a currently supported Node.js release.
 
 ## Requirements
 
@@ -170,7 +190,7 @@ npm run smoke-test
 npm run package-check
 ```
 
-`npm run check` also verifies the exact list of files that would be published. Before preparing a release, run `npm audit --audit-level=low`. CI builds the tarball once with Node.js 24, then installs and exercises that exact artifact, including its TypeScript declarations, on Node.js 16.14, 18, 20, 22, 24 and 26. Publishing and tagging remain manual steps.
+`npm run check` also verifies the exact list of files that would be published. Before preparing a release, run `npm audit --audit-level=low`. CI builds the tarball once with Node.js 24, then installs and exercises that exact artifact, including its TypeScript declarations, on Node.js 16.14, 18, 20, 22, 24 and 26. It also imports and runs that artifact in a real headless browser. Publishing and tagging remain manual steps.
 
 ## Project information
 

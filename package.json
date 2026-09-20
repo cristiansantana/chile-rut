@@ -18,7 +18,8 @@
     },
     "files": [
         "dist",
-        "CHANGELOG.md"
+        "CHANGELOG.md",
+        "README.es.md"
     ],
     "sideEffects": false,
     "scripts": {
