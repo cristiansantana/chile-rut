@@ -7,6 +7,7 @@ const expectedFiles = [
     "CHANGELOG.md",
     "LICENSE",
     "README.md",
+    "README.es.md",
     "dist/index.d.ts",
     "dist/index.js",
     "dist/index.js.map",
