@@ -31,7 +31,14 @@ if (!browser) {
 
 const runBrowser = (url) =>
     new Promise((resolveBrowser, rejectBrowser) => {
-        const browserProcess = spawn(browser, ["--headless=new", "--disable-gpu", "--no-sandbox", "--dump-dom", url]);
+        const browserProcess = spawn(browser, [
+            "--headless=new",
+            "--disable-gpu",
+            "--no-sandbox",
+            "--virtual-time-budget=1000",
+            "--dump-dom",
+            url,
+        ]);
         let stdout = "";
         let stderr = "";
         const timeout = setTimeout(() => {

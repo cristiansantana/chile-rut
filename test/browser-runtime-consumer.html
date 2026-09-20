@@ -7,13 +7,11 @@
     <body>
         <output id="result" data-browser-test="running">Running browser runtime test</output>
         <script type="module">
+            import { getCheckDigit, validateRut, validateRutFormat } from "/node_modules/@cristiansantana/chile-rut/dist/index.js";
+
             const result = document.querySelector("#result");
 
             try {
-                const { getCheckDigit, validateRut, validateRutFormat } = await import(
-                    "/node_modules/@cristiansantana/chile-rut/dist/index.js"
-                );
-
                 if (getCheckDigit("12345678") !== "5") throw new Error("Unexpected check digit");
                 if (!validateRut("12.345.678-5")) throw new Error("Expected a valid RUT");
                 if (validateRut("12.345.678-6")) throw new Error("Expected an invalid RUT");
