@@ -3,10 +3,28 @@
 [English](./README.md) | [Español](./README.es.md)
 
 [![Build main](https://img.shields.io/github/actions/workflow/status/cristiansantana/chile-rut/build.yml?branch=main&event=push&label=build%20main&logo=github)](https://github.com/cristiansantana/chile-rut/actions/workflows/build.yml?query=branch%3Amain)
+[![Node.js](https://img.shields.io/node/v/@cristiansantana/chile-rut?logo=node.js&label=Node.js)](https://www.npmjs.com/package/@cristiansantana/chile-rut)
+[![Entorno](https://img.shields.io/badge/entorno-Browser%20%2B%20Node.js-2ea44f?logo=javascript)](#compatibilidad)
 
 Chile-Rut es un paquete de JavaScript ESM con declaraciones de TypeScript para trabajar con el número de identificación chileno conocido como RUT o RUN.
 
 Valida la sintaxis y los dígitos verificadores mediante módulo 11. **No** comprueba si un RUT ha sido emitido legalmente o si existe actualmente.
+
+## Compatibilidad
+
+Chile-Rut funciona tanto en navegadores modernos como en aplicaciones de Node.js.
+
+| Entorno | Compatibilidad |
+| --- | --- |
+| Navegadores modernos | ✅ |
+| Node.js 26.x | ✅ |
+| Node.js 24.x | ✅ |
+| Node.js 22.x | ✅ |
+| Node.js 20.x | ✅ |
+| Node.js 18.x | ✅ |
+| Node.js 16.14 o superior | ✅ |
+
+Para aplicaciones nuevas en producción, usa una versión de Node.js con soporte vigente.
 
 ## Requisitos
 
@@ -172,7 +190,7 @@ npm run smoke-test
 npm run package-check
 ```
 
-`npm run check` también verifica la lista exacta de archivos que se publicarían. Antes de preparar una publicación, ejecuta `npm audit --audit-level=low`. La integración continua genera el tarball una vez con Node.js 24 y luego instala y prueba ese mismo artefacto, incluidas sus declaraciones de TypeScript, en Node.js 16.14, 18, 20, 22, 24 y 26. La publicación y el etiquetado siguen siendo pasos manuales.
+`npm run check` también verifica la lista exacta de archivos que se publicarían. Antes de preparar una publicación, ejecuta `npm audit --audit-level=low`. La integración continua genera el tarball una vez con Node.js 24 y luego instala y prueba ese mismo artefacto, incluidas sus declaraciones de TypeScript, en Node.js 16.14, 18, 20, 22, 24 y 26. También importa y ejecuta ese artefacto en un navegador real sin interfaz. La publicación y el etiquetado siguen siendo pasos manuales.
 
 ## Información del proyecto
 

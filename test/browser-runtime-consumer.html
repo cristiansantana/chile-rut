@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Browser runtime test</title>
+    </head>
+    <body>
+        <output id="result" data-browser-test="running">Running browser runtime test</output>
+        <script type="module">
+            const result = document.querySelector("#result");
+
+            try {
+                const { getCheckDigit, validateRut, validateRutFormat } = await import(
+                    "/node_modules/@cristiansantana/chile-rut/dist/index.js"
+                );
+
+                if (getCheckDigit("12345678") !== "5") throw new Error("Unexpected check digit");
+                if (!validateRut("12.345.678-5")) throw new Error("Expected a valid RUT");
+                if (validateRut("12.345.678-6")) throw new Error("Expected an invalid RUT");
+                if (!validateRutFormat("18.765.002-K")) throw new Error("Expected a valid RUT format");
+
+                result.dataset.browserTest = "passed";
+                result.textContent = "Browser runtime test passed";
+            } catch (error) {
+                result.dataset.browserTest = "failed";
+                result.textContent = `Browser runtime test failed: ${error.message}`;
+            }
+        </script>
+    </body>
+</html>
