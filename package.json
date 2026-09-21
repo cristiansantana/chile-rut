@@ -1,6 +1,6 @@
 {
     "name": "@cristiansantana/chile-rut",
-    "version": "1.0.9",
+    "version": "1.0.10",
     "packageManager": "npm@11.17.0",
     "description": "Javascript (Typescript ready) chilean RUT toolset: Validate, generate and verify format.",
     "engines": {
