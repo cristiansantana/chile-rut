@@ -31,7 +31,8 @@
         "format-write": "prettier \"**/*.{js,mjs,ts,json}\" --write --config .prettierrc.json",
         "smoke-test": "node -e \"import('./dist/index.js').then(({ getCheckDigit, validateRut }) => { if (getCheckDigit('12345678') !== '5' || !validateRut('12345678-5')) process.exit(1); })\"",
         "package-check": "node test/package-contents.mjs",
-        "check": "npm run format-check && npm run type-check && npm run test-coverage && npm run build && npm run smoke-test && npm run package-check",
+        "coverage-config-check": "node test/coverage-config.mjs",
+        "check": "npm run format-check && npm run type-check && npm run coverage-config-check && npm run test-coverage && npm run build && npm run smoke-test && npm run package-check",
         "prepublishOnly": "npm run check"
     },
     "author": {
@@ -61,6 +62,9 @@
         "ts"
     ],
     "overrides": {
+        "@istanbuljs/load-nyc-config": {
+            "js-yaml": "4.3.2"
+        },
         "esbuild": "0.28.2"
     },
     "devDependencies": {
