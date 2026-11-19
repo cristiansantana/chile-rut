@@ -1,10 +1,13 @@
 import { readFileSync } from "node:fs";
 import * as packageExports from "@cristiansantana/chile-rut";
 
-const { getCheckDigit, validateRut, validateRutCheckDigitFormat, validateRutFormat, validateRutIdFormat } = packageExports;
+const { formatRut, getCheckDigit, parseRut, validateRut, validateRutCheckDigitFormat, validateRutFormat, validateRutIdFormat } =
+    packageExports;
 
 const expectedExports = [
+    "formatRut",
     "getCheckDigit",
+    "parseRut",
     "validateRut",
     "validateRutCheckDigitFormat",
     "validateRutFormat",
@@ -36,6 +39,15 @@ const assertInvalidRutIdError = (callback, context) => {
 };
 
 assert(JSON.stringify(Object.keys(packageExports).sort()) === JSON.stringify(expectedExports), "Unexpected package exports");
+
+const parsed = parseRut("00.018.765.002-k");
+assert(parsed.ok && parsed.canonical === "18765002-K", "Expected a canonical RUT from parseRut");
+const invalid = parseRut("12.345.678-6");
+assert(!invalid.ok && invalid.reason === "invalid_check_digit", "Expected a check digit error from parseRut");
+assert(formatRut("18.765.002-k", { style: "dotted" }) === "18.765.002-K", "Expected a dotted RUT");
+assert(formatRut("18.765.002-k", { style: "plain" }) === "18765002-K", "Expected a plain RUT");
+assert(formatRut("18.765.002-k") === null, "Expected an explicit style");
+assert(formatRut("18.765.002-k", { style: "unknown" }) === null, "Expected an unsupported style to return null");
 
 for (const [rutId, expected] of [
     ["12345678", "5"],

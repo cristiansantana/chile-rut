@@ -89,6 +89,31 @@ getCheckDigit("0"); // throws
 
 ## API
 
+### `parseRut(input)`
+
+Validates the same syntax and modulo-11 check digit as `validateRut`. On success, it returns `ok: true`, the identifier as digits without leading zeros, the check digit with uppercase `K`, and a canonical string for storage.
+
+```js
+import { parseRut } from "@cristiansantana/chile-rut";
+
+parseRut("00.012.345.678-5");
+// { ok: true, id: "12345678", checkDigit: "5", canonical: "12345678-5" }
+```
+
+On failure, it returns `{ ok: false, reason }`. The reason is `invalid_format` for non-string values or unsupported syntax, `zero_id` for an identifier consisting only of zeros, or `invalid_check_digit` for a modulo-11 mismatch.
+
+### `formatRut(input, { style })`
+
+Validates the RUT and returns it for display with `dotted` or in canonical form with `plain`. The style is required. Invalid inputs and missing or unsupported styles return `null`.
+
+```js
+import { formatRut } from "@cristiansantana/chile-rut";
+
+formatRut("18.765.002-k", { style: "dotted" }); // "18.765.002-K"
+formatRut("18.765.002-k", { style: "plain" }); // "18765002-K"
+formatRut("12.345.678-6", { style: "dotted" }); // null
+```
+
 ### `getCheckDigit(rutId)`
 
 Calculates the modulo-11 check digit for a RUT identifier and returns it as a string. It throws an `Error` when the identifier has an unsupported format or consists only of zeros.

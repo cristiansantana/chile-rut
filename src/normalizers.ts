@@ -1,5 +1,5 @@
-import { INVALID_RUT_CHECK_DIGIT_MESSAGE, INVALID_RUT_ID_MESSAGE, INVALID_RUT_MESSAGE } from "./errors";
-import { validateRutCheckDigitFormat, validateRutFormat, validateRutIdFormat } from "./formats";
+import { INVALID_RUT_CHECK_DIGIT_MESSAGE, INVALID_RUT_ID_MESSAGE } from "./errors";
+import { validateRutCheckDigitFormat, validateRutIdFormat } from "./formats";
 
 export const isZeroRutId = (rutNumber: string) => /^0+$/.test(rutNumber.replace(/[.,]/g, ""));
 
@@ -23,14 +23,4 @@ export const getNormalizedRutCheckDigit = (checkDigit: string) => {
     }
 
     return checkDigit === "k" ? "K" : checkDigit;
-};
-
-export const getNormalizedRut = (rut: string) => {
-    if (!validateRutFormat(rut)) {
-        throw new Error(INVALID_RUT_MESSAGE);
-    }
-
-    const components = rut.split("-");
-
-    return getNormalizedRutId(components[0]) + "-" + getNormalizedRutCheckDigit(components[1]);
 };

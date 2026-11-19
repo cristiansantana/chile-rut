@@ -89,6 +89,31 @@ getCheckDigit("0"); // lanza un error
 
 ## API
 
+### `parseRut(input)`
+
+Comprueba la misma sintaxis y el mismo dígito verificador de módulo 11 que `validateRut`. Si el RUT es válido, devuelve `ok: true`, el identificador con solo dígitos y sin ceros iniciales, el dígito verificador con `K` mayúscula y una cadena canónica para guardar.
+
+```js
+import { parseRut } from "@cristiansantana/chile-rut";
+
+parseRut("00.012.345.678-5");
+// { ok: true, id: "12345678", checkDigit: "5", canonical: "12345678-5" }
+```
+
+Si el RUT es inválido, devuelve `{ ok: false, reason }`. El motivo es `invalid_format` para valores que no son cadenas o cuya sintaxis no se admite, `zero_id` para identificadores compuestos solo por ceros o `invalid_check_digit` si el dígito verificador no coincide.
+
+### `formatRut(input, { style })`
+
+Valida el RUT y lo devuelve con puntos para mostrarlo (`dotted`) o en su forma canónica (`plain`). El estilo es obligatorio. Una entrada inválida o un estilo ausente o no admitido devuelve `null`.
+
+```js
+import { formatRut } from "@cristiansantana/chile-rut";
+
+formatRut("18.765.002-k", { style: "dotted" }); // "18.765.002-K"
+formatRut("18.765.002-k", { style: "plain" }); // "18765002-K"
+formatRut("12.345.678-6", { style: "dotted" }); // null
+```
+
 ### `getCheckDigit(rutId)`
 
 Calcula el dígito verificador de módulo 11 para un identificador de RUT y lo devuelve como texto. Lanza un `Error` cuando el identificador tiene un formato no admitido o está compuesto únicamente por ceros.
